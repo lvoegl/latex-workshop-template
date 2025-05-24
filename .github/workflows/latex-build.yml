@@ -32,13 +32,22 @@ jobs:
             '.[$tools][] | [.[$command]] + .[$args] | join(" ")' \
             .vscode/settings.json)
           for tex_file in *.tex; do
-            tex_command="$(echo "$command" | sed "s/%DOC%/$tex_file/g") -auxdir=action-aux -outdir=action-out"
+            tex_command="$(echo "$command" | sed "s/%DOC%/$tex_file/g" | sed "s/%DIR%/./g")"
             eval "$tex_command"
           done
 
       - name: Upload .tex files
-        uses: actions/upload-artifact@v4
+        id: upload
+        shell: bash
+        run: |
+          outdir=$(jq -r \
+            --arg tools "latex-workshop.latex.tools" \
+            --arg args "args" \
+            '.[$tools][] | .[$args][] | select(startswith("-outdir=")) | split("=")[1]' \
+            .vscode/settings.json | sed "s/%DIR%/./g")
+          echo pdf_paths="$outdir/*.pdf" >> "$GITHUB_OUTPUT"
+          echo artifact_name=${GITHUB_REPOSITORY#*/}-${GITHUB_SHA::7} >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
         with:
-          name: LaTeX Files
-          path: |
-            action-out/
+          name: ${{ steps.upload.outputs.artifact_name }}
+          path: ${{ steps.upload.outputs.pdf_paths }}
