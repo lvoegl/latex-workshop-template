@@ -2,11 +2,13 @@
     "latex-workshop.bibtex-fields.sort.enabled": true,
     "latex-workshop.view.outline.sync.viewer": true,
     "latex-workshop.linting.chktex.enabled": true,
-    "latex-workshop.latexindent.args": [
-        "-c",
-        "%DIR%/build",
-        "%TMPFILE%",
-        "-y=defaultIndent: '%INDENT%'"
+    "latex-workshop.formatting.latex": "tex-fmt",
+    "latex-workshop.formatting.tex-fmt.args": [
+        "--noconfig",
+        "--wraplen",
+        "80",
+        "--tabsize",
+        "2"
     ],
     "latex-workshop.latex.tools": [
         {
